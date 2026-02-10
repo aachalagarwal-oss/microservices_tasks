@@ -53,7 +53,6 @@ async def proxy_me(user: dict = Depends(validate_token)):
         except httpx.RequestError:
             raise HTTPException(status_code=503, detail="User service unavailable")
 
-        # Return downstream response verbatim (status, headers, body)
         content = resp.content
         headers = {}
         if resp.headers.get("content-type"):
@@ -66,7 +65,7 @@ async def _proxy_task_request(method: str, user: dict, path: str = "", body: byt
     Helper function to proxy requests to task service
     """
     token = f"Bearer {user['token']}"
-    # Build downstream URL
+    
     if path:
         downstream_url = f"{TASK_SERVICE}/tasks/{path}"
     else:
