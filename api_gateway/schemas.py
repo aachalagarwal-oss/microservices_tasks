@@ -1,8 +1,6 @@
 from pydantic import BaseModel
 from enum import Enum
-
 from typing import Optional
-from datetime import datetime
 
 class TaskStatus(str, Enum):
     pending = "pending"
@@ -18,15 +16,3 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[TaskStatus] = None
-
-class TaskResponse(BaseModel):
-    id: int
-    title: str
-    description: Optional[str] = None
-    status: str
-    user_id: int
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-

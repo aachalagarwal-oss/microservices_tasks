@@ -1,4 +1,4 @@
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete as sql_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from models.task_profile import Task
@@ -30,17 +30,21 @@ class TaskService:
             raise HTTPException(status_code=404, detail=f"No task with id {id} found")
         return task
 
-    async def update_task(self, id: int, title: str, description: str, status: str, user_id: int):
+    async def update_task(self, id: int, user_id: int, title: str = None, description: str = None, status: str = None):
         task = await self.get_task_by_id(user_id, id)
-        task.title = title
-        task.description = description
-        task.status = status
+        if title is not None:
+            task.title = title
+        if description is not None:
+            task.description = description
+        if status is not None:
+            task.status = status
         await self.db.commit()
         await self.db.refresh(task)
         return task
 
     async def delete_task(self, user_id: int, id: int):
         task = await self.get_task_by_id(user_id, id)
-        await self.db.delete(task)
+        # Delete using session.delete() which is synchronous
+        self.db.delete(task)
         await self.db.commit()
-        return "The task is deleted"
+        return {"message": "Task deleted successfully", "task_id": id}
